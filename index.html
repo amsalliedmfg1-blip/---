@@ -1016,34 +1016,73 @@
         }
 
         function refreshData() {
-            setCurrentDate();
-            Swal.fire({
-                title: 'กำลังโหลดข้อมูลจาก Google Sheets...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
+    setCurrentDate();
 
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run
-                    .withSuccessHandler(res => {
-                        try {
-                            tasks = JSON.parse(res);
-                            renderTables();
-                            Swal.close();
-                            const Toast = Swal.mixin({ toast: true, position: "top-end", showConfirmButton: false, timer: 1500 });
-                            Toast.fire({ icon: "success", title: "อัปเดตข้อมูลล่าสุดจาก Google Sheets แล้ว" });
-                        } catch (e) {
-                            Swal.fire('Error', 'รูปแบบข้อมูลไม่ถูกต้อง: ' + e.message, 'error');
-                        }
-                    })
-                    .withFailureHandler(err => {
-                        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ Google Sheets ได้: ' + err.message, 'error');
-                    })
-                    .getData();
-            } else {
-                Swal.fire('แจ้งเตือน', 'ฟังก์ชัน Google Apps Script ไม่พร้อมใช้งาน (ต้องใช้งานผ่าน Web App)', 'warning');
-            }
+    Swal.fire({
+        title: 'กำลังโหลดข้อมูลจาก Google Sheets...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
         }
+    });
+
+    if (typeof google !== 'undefined' &&
+        google.script &&
+        google.script.run) {
+
+        google.script.run
+            .withSuccessHandler(res => {
+                try {
+                    tasks = JSON.parse(res);
+
+                    renderTables();
+
+                    Swal.close();
+
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    Toast.fire({
+                        icon: "success",
+                        title: "อัปเดตข้อมูลล่าสุดจาก Google Sheets แล้ว"
+                    });
+
+                } catch (e) {
+
+                    Swal.fire(
+                        'Error',
+                        'รูปแบบข้อมูลไม่ถูกต้อง: ' + e.message,
+                        'error'
+                    );
+                }
+            })
+
+            .withFailureHandler(err => {
+
+                Swal.fire(
+                    'Error',
+                    'ไม่สามารถเชื่อมต่อ Google Sheets ได้: ' +
+                    (err.message || err),
+                    'error'
+                );
+
+            })
+
+            .getData();
+
+    } else {
+
+        Swal.fire(
+            'แจ้งเตือน',
+            'หน้านี้ต้องเปิดผ่าน Google Apps Script Web App',
+            'warning'
+        );
+    }
+}
 
         function testConnection() {
             Swal.fire({
